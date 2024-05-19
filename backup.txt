@@ -10,29 +10,7 @@ using namespace std;
 #define PORT "1234"
 const int BUFLEN = 1024;
 
-string workingdirectory() {
-    FILE *f;
-    char text[100];
-    f = popen("cd", "r");
-
-    fgets(text, 100, f);
-
-    return text;
-}
-
-string getDirToMake(string s) {
-    for (int i = s.size() - 1; i >= 0; i--) {
-        if (s[i] != '\\')
-            s.erase(i, 1);
-        else
-            break;
-    }
-    return s;
-}
-
 int main() {
-
-    string wd = workingdirectory();
 
     WSADATA wsaData;
     int iResult;
@@ -135,9 +113,8 @@ int main() {
             closesocket(ClientSocket);
             WSACleanup();
             return 1;
-            // continue;
         }
-        if (recvbuf[offset] != '\'') {
+        if (recvbuf[offset] != '\"') {
             // idk man
             // break;
             cerr << "\nheader is misplaced, exiting with -1\n";
@@ -151,7 +128,7 @@ int main() {
                 offset = 0;
                 iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
             }
-            if (recvbuf[offset] == '\'') {
+            if (recvbuf[offset] == '\"') {
                 offset++;
                 if (offset >= recvbuflen) {
                     offset = 0;
@@ -182,14 +159,9 @@ int main() {
         cout << fileSizeStr << "\n";
 
         nextHeader = stoll(fileSizeStr);
-        cout << "\nnextHeader: " << nextHeader << "\n";
-        string newdir = getDirToMake(filename);
-        cout << ("mkdir \"" + newdir + "\"").c_str() << "\n";
-        system(("mkdir \"" + newdir + "\"").c_str());
-        cout << newdir << "\n";
-        system(("cd " + newdir).c_str());
+        cout << "\n1nextHeader: " << nextHeader << "\n";
         fout = fstream(filename, ios_base::trunc | ios_base::out | ios_base::binary);
-        system(("cd " + wd).c_str());
+
         while (nextHeader + offset >= iResult) {
             fout.write(recvbuf + offset, iResult - offset);
             nextHeader -= (iResult - offset);
