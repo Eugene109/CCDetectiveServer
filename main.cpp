@@ -190,7 +190,6 @@ int main() {
         fout = fstream(filename, ios_base::trunc | ios_base::out | ios_base::binary);
         system(("cd " + wd).c_str());
         while (nextHeader + offset >= iResult) {
-            cout.write(recvbuf + offset, iResult - offset);
             fout.write(recvbuf + offset, iResult - offset);
             nextHeader -= (iResult - offset);
             offset = 0;
