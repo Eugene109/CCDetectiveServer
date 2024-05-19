@@ -162,7 +162,7 @@ int main() {
             }
             filename += recvbuf[offset];
         }
-        cout << filename << "\n";
+        cout << "\n\n" << filename << "\n";
 
         string fileSizeStr = "";
         for (; true; offset++) {
@@ -180,10 +180,8 @@ int main() {
             }
             fileSizeStr += recvbuf[offset];
         }
-        cout << fileSizeStr << "\n";
-
         nextHeader = stoll(fileSizeStr);
-        cout << "\nnextHeader: " << nextHeader << "\n";
+        cout << "nextHeader: " << nextHeader << "\n";
         string newdir = getDirToMake(filename);
         cout << ("mkdir \"" + newdir + "\"").c_str() << "\n";
         system(("mkdir \"" + newdir + "\"").c_str());
@@ -192,13 +190,14 @@ int main() {
         fout = fstream(filename, ios_base::trunc | ios_base::out | ios_base::binary);
         system(("cd " + wd).c_str());
         while (nextHeader + offset >= iResult) {
+            cout.write(recvbuf + offset, iResult - offset);
             fout.write(recvbuf + offset, iResult - offset);
             nextHeader -= (iResult - offset);
             offset = 0;
             iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-            // if (iResult == 0) {
-            //     break;
-            // }
+            if (iResult == 0) {
+                break;
+            }
         }
         fout.write(recvbuf + offset, nextHeader);
         offset += nextHeader;
